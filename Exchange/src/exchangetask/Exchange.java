@@ -90,40 +90,43 @@ public class Exchange implements ExchangeInterface, QueryInterface {
 	}
 
 	void processOrder(Order order) throws RequestRejectedException {
-		if (order.isBuy) {
-			while (order.Size > 0 && getSellerForPrice(order.Price) > 0) {
-				Order lowestSellerOrder = new Order();
-				long sellerId = getSellerForPrice(order.Price);
-				for (int i = 0; i < alOrders.size(); i++) {
-					Order tmp = (Order) alOrders.get(i);
-					if (tmp.orderId == sellerId) {
-						lowestSellerOrder = tmp;
-					}
+		if (order.isBuy)
+			processOrderBuy(order);
+		else
+			processOrderSell(order);
+	}
+
+	void processOrderBuy(Order order) throws RequestRejectedException {
+		while (order.Size > 0 && getSellerForPrice(order.Price) > 0) {
+			Order lowestSellerOrder = new Order();
+			long sellerId = getSellerForPrice(order.Price);
+			for (int i = 0; i < alOrders.size(); i++) {
+				Order tmp = (Order) alOrders.get(i);
+				if (tmp.orderId == sellerId) {
+					lowestSellerOrder = tmp;
 				}
+			}
 
 //				System.out.println("order:" + order.toString());
-				System.out.println("lowestPiceOrder:" + lowestSellerOrder.toString());
+			System.out.println("lowestPiceOrder:" + lowestSellerOrder.toString());
 //				
 
-				if (lowestSellerOrder.orderId == 0)
-					break;
+			if (lowestSellerOrder.orderId == 0)
+				break;
 
-				if (order.Size >= lowestSellerOrder.Size) {
-					order.Size -= lowestSellerOrder.Size;
-					lowestSellerOrder.Size = 0;
-				} else {
-					lowestSellerOrder.Size -= order.Size;
-					order.Size = 0;
-				}
+			if (order.Size >= lowestSellerOrder.Size) {
+				order.Size -= lowestSellerOrder.Size;
+				lowestSellerOrder.Size = 0;
+			} else {
+				lowestSellerOrder.Size -= order.Size;
+				order.Size = 0;
+			}
 //				System.out.println("order:" + order.toString());
 //				System.out.println("lowestPiceOrder:" + lowestSellerOrder.toString());
-			}
-		} else
-			processOrderSell(order);
+		}
 
 	}
 
-	
 	void processOrderSell(Order order) throws RequestRejectedException {
 
 		while (order.Size > 0 && getBuyerForPrice(order.Price) > 0) {
