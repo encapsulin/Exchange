@@ -16,7 +16,7 @@ public class Exchange implements ExchangeInterface, QueryInterface {
 		int iTotalSizeAtPrice = 0;
 		for (int i = 0; i < alOrders.size(); i++) {
 			Order tmp = (Order) alOrders.get(i);
-			if ( tmp.Price == price && tmp.Size > 0) {
+			if (tmp.Price == price && tmp.Size > 0) {
 				iTotalSizeAtPrice += tmp.Size;
 			}
 		}
@@ -54,7 +54,7 @@ public class Exchange implements ExchangeInterface, QueryInterface {
 
 	@Override
 	public void send(long orderId, boolean isBuy, int price, int size) throws RequestRejectedException {
-		System.out.printf("\nsend(%d, %b, %s, %s);\n",orderId, isBuy, price, size);
+		System.out.printf("\nsend(%d, %b, %s, %s);\n", orderId, isBuy, price, size);
 		Order order = new Order(orderId, isBuy, price, size);
 		alOrders.add(order);
 		// recalcMatchingOrders();
@@ -79,7 +79,7 @@ public class Exchange implements ExchangeInterface, QueryInterface {
 		for (int i = 0; i < alOrders.size(); i++) {
 			Order tmp = (Order) alOrders.get(i);
 			if (!tmp.isBuy && tmp.Size > 0) {
-				if (tmp.Price <= iPriceMax && ( lowestSeller.Price == 0 || lowestSeller.Price > tmp.Price)) {
+				if (tmp.Price <= iPriceMax && (lowestSeller.Price == 0 || lowestSeller.Price > tmp.Price)) {
 					lowestSeller.orderId = tmp.orderId;
 					lowestSeller.Price = tmp.Price;
 				}
@@ -88,7 +88,8 @@ public class Exchange implements ExchangeInterface, QueryInterface {
 		}
 		return lowestSeller.orderId;
 	}
-		void processOrder(Order order) throws RequestRejectedException {
+
+	void processOrder(Order order) throws RequestRejectedException {
 		if (order.isBuy) {
 			while (order.Size > 0 && getSellerForPrice(order.Price) > 0) {
 				Order lowestSellerOrder = new Order();
@@ -99,15 +100,14 @@ public class Exchange implements ExchangeInterface, QueryInterface {
 						lowestSellerOrder = tmp;
 					}
 				}
-				
 
 //				System.out.println("order:" + order.toString());
 				System.out.println("lowestPiceOrder:" + lowestSellerOrder.toString());
 //				
-				
-				if(lowestSellerOrder.orderId ==0)
+
+				if (lowestSellerOrder.orderId == 0)
 					break;
-				
+
 				if (order.Size >= lowestSellerOrder.Size) {
 					order.Size -= lowestSellerOrder.Size;
 					lowestSellerOrder.Size = 0;
@@ -118,8 +118,51 @@ public class Exchange implements ExchangeInterface, QueryInterface {
 //				System.out.println("order:" + order.toString());
 //				System.out.println("lowestPiceOrder:" + lowestSellerOrder.toString());
 			}
-		}
+		} else
+			processOrderSell(order);
 
+	}
+
+	
+	void processOrderSell(Order order) throws RequestRejectedException {
+
+		while (order.Size > 0 && getBuyerForPrice(order.Price) > 0) {
+			Order bestSellerOrder = new Order();
+			long sellerId = getBuyerForPrice(order.Price);
+			for (int i = 0; i < alOrders.size(); i++) {
+				Order tmp = (Order) alOrders.get(i);
+				if (tmp.orderId == sellerId) {
+					bestSellerOrder = tmp;
+				}
+			}
+
+			System.out.println("bestPiceOrder:" + bestSellerOrder.toString());
+
+			if (bestSellerOrder.orderId == 0)
+				break;
+
+			if (order.Size >= bestSellerOrder.Size) {
+				order.Size -= bestSellerOrder.Size;
+				bestSellerOrder.Size = 0;
+			} else {
+				bestSellerOrder.Size -= order.Size;
+				order.Size = 0;
+			}
+		}
+	}
+
+	public long getBuyerForPrice(int iPrice) {
+		Order bestSeller = new Order();
+		for (int i = 0; i < alOrders.size(); i++) {
+			Order tmp = (Order) alOrders.get(i);
+			if (tmp.isBuy && tmp.Size > 0) {
+				if (tmp.Price >= iPrice && (bestSeller.Price == 0 || bestSeller.Price > tmp.Price)) {
+					bestSeller.orderId = tmp.orderId;
+					bestSeller.Price = tmp.Price;
+				}
+			}
+		}
+		return bestSeller.orderId;
 	}
 
 	void show() {
@@ -127,7 +170,7 @@ public class Exchange implements ExchangeInterface, QueryInterface {
 //		System.out.println("the Exchange csv:");
 		System.out.println("");
 		System.out.println("id	| Buy/Sell	| Price	| Size");
-		System.out.println("------------------------------");
+		System.out.println("--------------------------------------");
 
 		for (int i = 0; i < alOrders.size(); i++) {
 			Order tmp = (Order) alOrders.get(i);
