@@ -5,18 +5,31 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
-public class OrderTreeMap {
+public class OrderSortedSet {
 
-//	Map<Integer, Order> map = new TreeMap<>(Comparator.comparingInt(s -> s.getPrice));
-	//300000 items, 400041ms = 6m 40s 41ms
-	//100000 items, 46996ms = 0m 46s 996ms
-	
+	// 300000 items, 400041ms = 6m 40s 41ms
+	// 100000 items, 46996ms = 0m 46s 996ms
+
+	Set<Order> aList;
+
 	boolean showDebug = false;
 
-	public OrderTreeMap() {
-		aList = new HashMap<Integer, Order>();
+	public OrderSortedSet() {
+		aList = new TreeSet<Order>(new Comparator<Order>() {
+			@Override
+			public int compare(Order o1, Order o2) {
+				if (o1.getPrice() > o2.getPrice())
+					return 1;
+				if (o1.getPrice() < o2.getPrice())
+					return 1;
+				return 0;
+			}
+		});
 	}
 
 	public void orderAdd(Order order) {
@@ -42,13 +55,12 @@ public class OrderTreeMap {
 
 		int iMinMax = 0;
 		Order orderBestMatch = null;
-		for (Order order:aList.values()) {		
+		for (Order order : aList) {
 
 			if (order.getCount() == 0 || orderNew.isBuy() == order.isBuy())
 				continue;
 
-			if ((orderNew.isBuy() && iMinMax < order.getPrice())
-					|| (!orderNew.isBuy() && iMinMax > order.getPrice())) {
+			if ((orderNew.isBuy() && iMinMax < order.getPrice()) || (!orderNew.isBuy() && iMinMax > order.getPrice())) {
 				iMinMax = order.getPrice();
 				orderBestMatch = order;
 			}
@@ -69,7 +81,7 @@ public class OrderTreeMap {
 			}
 		}
 
-		aList.put(orderNew.getId(),orderNew);
+		aList.add(orderNew);
 
 		show();
 	}
@@ -80,7 +92,7 @@ public class OrderTreeMap {
 		System.out.print("=====================================");
 		System.out.print("\nid\t| buy?\t| count\t| price");
 		System.out.print("\n-------------------------------------");
-		for (Order order:aList.values()) 
+		for (Order order : aList)
 			System.out.printf("\n%d\t| %s\t| %d\t| %d ", order.getId(), order.isBuyS(), order.getCount(),
 					order.getPrice());
 		System.out.print("\n=====================================");
@@ -88,7 +100,7 @@ public class OrderTreeMap {
 
 	int getTotalBuyCount() {
 		int i = 0;
-		for (Order order:aList.values()) 
+		for (Order order : aList)
 			if (order.isBuy())
 				i += order.getCount();
 		return i;
@@ -96,15 +108,15 @@ public class OrderTreeMap {
 
 	int getMaxBuyPrice() {
 		int i = 0;
-		for (Order order:aList.values()) 
+		for (Order order : aList)
 			if (order.isBuy() && (i == 0 || i < order.getPrice()))
 				i = order.getPrice();
 		return i;
 	}
-	
+
 	int getTotalSellCount() {
 		int i = 0;
-		for (Order order:aList.values()) 
+		for (Order order : aList)
 			if (!order.isBuy())
 				i += order.getCount();
 		return i;
@@ -112,9 +124,9 @@ public class OrderTreeMap {
 
 	int getMinSellPrice() {
 		int i = 0;
-		for (Order order:aList.values()) 
+		for (Order order : aList)
 			if (!order.isBuy() && (i == 0 || i > order.getPrice()))
 				i = order.getPrice();
 		return i;
-	}	
+	}
 }
