@@ -10,13 +10,14 @@ public class App {
 	
 	public static void main(String[] args) {
 		System.out.println("main()");
-		OrderArrayList exchange = new OrderArrayList();//100000 items, 46996ms = 0m 46s 996ms	
+//		OrderArrayList exchange = new OrderArrayList();//100000 items, 46996ms = 0m 46s 996ms	
 //    	OrderHashMap exchange = new OrderHashMap();	//100000 items, 67201ms = 1m 7s 201ms	
-
+		OrderSortedSet exchange = new OrderSortedSet();	//100000 items, 83ms = 0m 0s 83ms
+		
 		long time1 = System.currentTimeMillis();
 //		System.out.println(time1);
 		int i;
-		for (i = 0; i < 100000; i++) {
+		for (i = 0; i < 300000; i++) {
 			Random rnd = new Random();
 			exchange.orderAdd(new Order(i, (i % 2 == 0), rnd.nextInt(10), rnd.nextInt(10)));
 			if(i%10000==0)

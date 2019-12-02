@@ -25,9 +25,10 @@ public class OrderSortedSet {
 			public int compare(Order o1, Order o2) {
 				if (o1.getPrice() > o2.getPrice())
 					return 1;
-				if (o1.getPrice() < o2.getPrice())
-					return 1;
-				return 0;
+//				if (o1.getPrice() < o2.getPrice())
+//					return -1;
+//				return 0;
+				return -1;
 			}
 		});
 	}
@@ -109,7 +110,7 @@ public class OrderSortedSet {
 	int getMaxBuyPrice() {
 		int i = 0;
 		for (Order order : aList)
-			if (order.isBuy() && (i == 0 || i < order.getPrice()))
+			if (order.isBuy() && order.getCount() > 0 && (i == 0 || i < order.getPrice()))
 				i = order.getPrice();
 		return i;
 	}
