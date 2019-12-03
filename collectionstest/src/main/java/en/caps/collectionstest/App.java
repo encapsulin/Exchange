@@ -10,6 +10,8 @@ public class App {
 	
 	public static void main(String[] args) {
 		System.out.println("main()");
+		
+		//OrderParent.exec(list);
 //		OrderArrayList exchange = new OrderArrayList(); //100000 items, 46996ms  = 0m 46s 996ms	
 //    	OrderHashMap exchange = new OrderHashMap();	    //100000 items, 67201ms  = 1m 7s 201ms	
 		OrderSortedSet exchange = new OrderSortedSet();	//100000 items, 100296ms = 1m 40s 296ms
