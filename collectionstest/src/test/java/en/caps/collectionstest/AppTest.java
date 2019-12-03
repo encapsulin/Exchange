@@ -30,7 +30,7 @@ public class AppTest extends TestCase {
 	public void testApp() {
 		OrderSortedSet exchange = new OrderSortedSet();
 		exchange.showDebug = true;
-		int i = 0;
+		int i = 1;
 		
 		exchange.orderAdd(new Order(i++, true, 4, 7));		
 		assertTrue(exchange.getTotalBuyCount() == 4);
