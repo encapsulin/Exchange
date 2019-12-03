@@ -12,10 +12,10 @@ import java.util.TreeSet;
 
 public class OrderSortedSet {
 
-	// 300000 items, 400041ms = 6m 40s 41ms
+	//ArrayList 300000 items, 400041ms = 6m 40s 41ms
 	// 100000 items, 46996ms = 0m 46s 996ms
 
-//	Set<Order> aList;
+//	Set<Order> aList;//300000 items, 669200ms = 11m 9s 200ms
 	Set<Order> aListSell;
 	Set<Order> aListBuy;
 
