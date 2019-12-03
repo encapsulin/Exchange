@@ -28,8 +28,6 @@ public class AppTest extends TestCase {
 	 * Rigourous Test :-)
 	 */
 	public void testApp() {
-		// OrderArrayList exchange = new OrderArrayList();//100000 items, 46996ms = 0m
-		// 46s 996ms
 		OrderSortedSet exchange = new OrderSortedSet();
 		exchange.showDebug = true;
 		int i = 0;
@@ -54,7 +52,7 @@ public class AppTest extends TestCase {
 
 		exchange.orderAdd(new Order(i++, false, 3, 6));
 		assertTrue(exchange.getMaxBuyPrice() == 7);
-		assertTrue(exchange.getTotalBuyCount() == 6);
+		assertTrue(exchange.getTotalBuyCount() == 1);
 		assertTrue(exchange.getMinSellPrice() == 9);
 		assertTrue(exchange.getTotalSellCount() == 2);
 	}

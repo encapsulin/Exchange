@@ -15,20 +15,28 @@ public class OrderSortedSet {
 	// 300000 items, 400041ms = 6m 40s 41ms
 	// 100000 items, 46996ms = 0m 46s 996ms
 
-	Set<Order> aList;
+//	Set<Order> aList;
+	Set<Order> aListSell;
+	Set<Order> aListBuy;
 
 	boolean showDebug = false;
 
 	public OrderSortedSet() {
-		aList = new TreeSet<Order>(new Comparator<Order>() {
+		aListSell = new TreeSet<Order>(new Comparator<Order>() {
 			@Override
 			public int compare(Order o1, Order o2) {
 				if (o1.getPrice() > o2.getPrice())
 					return 1;
-//				if (o1.getPrice() < o2.getPrice())
-//					return -1;
-//				return 0;
+
 				return -1;
+			}
+		});
+		aListBuy = new TreeSet<Order>(new Comparator<Order>() {
+			@Override
+			public int compare(Order o1, Order o2) {
+				if (o1.getPrice() > o2.getPrice())
+					return -1;
+				return 1;
 			}
 		});
 	}
@@ -51,26 +59,30 @@ public class OrderSortedSet {
 	void addAndMatchCorrespondingOrder(Order orderNew) {
 		if (this.showDebug) {
 			System.out.println("\n\norderNew:");
-			System.out.println(orderNew);
+			System.out.print(orderNew);
 		}
 
 		int iMinMax = 0;
 		Order orderBestMatch = null;
+		Set<Order> aList;
+
+		if (orderNew.isBuy())
+			aList = aListSell;
+		else
+			aList = aListBuy;
+
 		for (Order order : aList) {
-
-			if (order.getCount() == 0 || orderNew.isBuy() == order.isBuy())
+			if (order.getCount() == 0 || (orderNew.isBuy() && order.getPrice() > orderNew.getPrice())
+					|| (!orderNew.isBuy() && order.getPrice() < orderNew.getPrice()))
 				continue;
-
-			if ((orderNew.isBuy() && iMinMax < order.getPrice()) || (!orderNew.isBuy() && iMinMax > order.getPrice())) {
-				iMinMax = order.getPrice();
-				orderBestMatch = order;
-			}
+			orderBestMatch = order;
+			break;
 		}
 
 		if (orderBestMatch != null) {
 			if (this.showDebug) {
 				System.out.println("orderBestMatch:");
-				System.out.println(orderBestMatch);
+				System.out.print(orderBestMatch);
 			}
 			int diff = orderBestMatch.getCount() - orderNew.getCount();
 			if (diff >= 0) {
@@ -78,19 +90,23 @@ public class OrderSortedSet {
 				orderNew.setCount(0);
 			} else {
 				orderBestMatch.setCount(0);
-				orderNew.setCount(diff);
+				orderNew.setCount(-diff);
 			}
 		}
 
-		aList.add(orderNew);
+		if (orderNew.isBuy())
+			aListBuy.add(orderNew);
+		else
+			aListSell.add(orderNew);
 
-		show();
+		show(aListBuy);
+		show(aListSell);
 	}
 
-	void show() {
+	void show(Set<Order> aList) {
 		if (!showDebug)
 			return;
-		System.out.print("=====================================");
+		System.out.print("\n=====================================");
 		System.out.print("\nid\t| buy?\t| count\t| price");
 		System.out.print("\n-------------------------------------");
 		for (Order order : aList)
@@ -101,32 +117,30 @@ public class OrderSortedSet {
 
 	int getTotalBuyCount() {
 		int i = 0;
-		for (Order order : aList)
-			if (order.isBuy())
-				i += order.getCount();
+		for (Order order : aListBuy)
+			i += order.getCount();
 		return i;
 	}
 
 	int getMaxBuyPrice() {
 		int i = 0;
-		for (Order order : aList)
-			if (order.isBuy() && order.getCount() > 0 && (i == 0 || i < order.getPrice()))
+		for (Order order : aListBuy)
+			if (order.getCount() > 0 && (i == 0 || i < order.getPrice()))
 				i = order.getPrice();
 		return i;
 	}
 
 	int getTotalSellCount() {
 		int i = 0;
-		for (Order order : aList)
-			if (!order.isBuy())
-				i += order.getCount();
+		for (Order order : aListSell)
+			i += order.getCount();
 		return i;
 	}
 
 	int getMinSellPrice() {
 		int i = 0;
-		for (Order order : aList)
-			if (!order.isBuy() && (i == 0 || i > order.getPrice()))
+		for (Order order : aListSell)
+			if (order.getCount() > 0 && (i == 0 || i > order.getPrice()))
 				i = order.getPrice();
 		return i;
 	}
