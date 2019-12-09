@@ -1,6 +1,6 @@
 package en.caps.collectionstest;
 
-public class Order {
+public class Order /* implements Comparable<Order> */ {
 
 	private int id;
 	private int count;
@@ -48,11 +48,29 @@ public class Order {
 	}
 
 	public String isBuyS() {
-		return (buy)?"Buy ":"Sell";
+		return (buy) ? "Buy " : "Sell";
 	}
+
 	@Override
-	public String toString() {		
+	public String toString() {
 		return "Order [id=" + id + ", buy=" + this.isBuyS() + ", count=" + count + ", price=" + price + "]";
+	}
+
+	//@Override
+	public int compareTo(Order o) {
+		if (this.buy) {
+			if (this.price < o.getPrice())
+				return 1;
+			else
+				return -1;
+		}
+		if (!this.buy) {
+			if (this.price > o.getPrice())
+				return 1;
+			else
+				return -1;
+		}
+		return 0;
 	}
 
 }

@@ -28,7 +28,8 @@ public class AppTest extends TestCase {
 	 * Rigourous Test :-)
 	 */
 	public void testApp() {
-		OrderSortedSet exchange = new OrderSortedSet();
+		//OrderArrayList2 exchange = new OrderArrayList2();		
+		OrderHashSet exchange = new OrderHashSet();
 		exchange.showDebug = true;
 		int i = 1;
 		
