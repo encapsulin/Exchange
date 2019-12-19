@@ -38,7 +38,7 @@ public class Order {
 	}
 
 	public static char parseType(String s) {
-		char type = 's';
+		char type = 's';//spread
 		if (s.matches(".*(bid|buy).*"))
 			type = 'b';
 		if (s.matches(".*(ask|sell).*"))

@@ -80,7 +80,28 @@ public class OrderBook {
 	public void update(int price, int size, char type) {
 		System.out.printf(" -> update(%d,%d,%s)", price, size, type);
 		Order order = new Order(price, size, type);
+
+		Order orderMatch = null;
+		boolean foundBestMatchingOrder = false;
+		do {
+			if (order.getType() == 'a')
+				orderMatch = findBest('b');
+			if (order.getType() == 'b')
+				orderMatch = findBest('a');
+//			if (orderMatch != null && orderMatch.getPrice() == order.getPrice()) {
+			if (orderMatch != null && orderMatch.getPrice() == order.getPrice()) {
+				foundBestMatchingOrder = true;
+				System.out.println(order);
+				int diff = Math.abs(order.getSize() - orderMatch.getSize());
+				order.setSize(order.getSize() - diff);
+				orderMatch.setSize(orderMatch.getSize() - diff);
+			} else
+				foundBestMatchingOrder = false;
+
+		} while (foundBestMatchingOrder);
+
 		aList.add(order);
+
 	}
 
 	void fileOutput(String s) {
@@ -116,7 +137,7 @@ public class OrderBook {
 
 	public void orderSellOrBuy(char type, int size) {
 		ArrayList<Order> aListSorted = new ArrayList<>(aList);
-		if (type == 's')
+		if (type == 'a')
 			Collections.sort(aListSorted, new Comparator<Order>() {
 				@Override
 				public int compare(Order lhs, Order rhs) {
@@ -139,7 +160,7 @@ public class OrderBook {
 				}
 			});
 		for (Order o : aListSorted) {
-			if (o.getType() == type) {
+			if (type == 'a' && o.getType() == 'b' || type == 'b' && o.getType() == 'a') {
 				int diff = Math.abs(o.getSize() - size);
 				size -= diff;
 				o.setSize(o.getSize() - diff);
