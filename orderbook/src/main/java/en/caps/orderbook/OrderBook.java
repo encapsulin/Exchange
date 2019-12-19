@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -72,10 +73,7 @@ public class OrderBook {
 		if (sArray[0].equals("o") && sArray.length == 3) {
 			char type = Order.parseType(sArray[1]);
 			int size = Integer.parseInt(sArray[2], 10);
-			if (type == 'b')
-				this.orderBuy(size);
-			if (type == 'a')
-				this.orderSell(size);
+			this.orderSellOrBuy(type, size);
 		}
 	}
 
@@ -105,7 +103,7 @@ public class OrderBook {
 		Order order = findBest(bidOrAsk);
 		if (order != null) {
 			System.out.println(order);
-			fileOutput(order.getPrice()+","+order.getSize());
+			fileOutput(order.getPrice() + "," + order.getSize());
 		}
 	}
 
@@ -113,15 +111,42 @@ public class OrderBook {
 		System.out.printf(" -> querySize(%d)", price);
 		int sum = 0;
 		sum = aList.stream().filter(o -> o.getPrice() == price).mapToInt(Order::getSize).sum();
-		fileOutput(sum+"");
+		fileOutput(sum + "");
 	}
 
-	public void orderBuy(int size) {
-		System.out.printf(" -> orderBuy(%d)", size);
-	}
-
-	public void orderSell(int size) {
-		System.out.printf(" -> orderSell(%d)", size);
+	public void orderSellOrBuy(char type, int size) {
+		ArrayList<Order> aListSorted = new ArrayList<>(aList);
+		if (type == 's')
+			Collections.sort(aListSorted, new Comparator<Order>() {
+				@Override
+				public int compare(Order lhs, Order rhs) {
+					if (lhs.getPrice() > rhs.getPrice())
+						return 1;
+					if (lhs.getPrice() < rhs.getPrice())
+						return -1;
+					return 0;
+				}
+			});
+		if (type == 'b')
+			Collections.sort(aListSorted, new Comparator<Order>() {
+				@Override
+				public int compare(Order lhs, Order rhs) {
+					if (lhs.getPrice() > rhs.getPrice())
+						return -1;
+					if (lhs.getPrice() < rhs.getPrice())
+						return 1;
+					return 0;
+				}
+			});
+		for (Order o : aListSorted) {
+			if (o.getType() == type) {
+				int diff = Math.abs(o.getSize() - size);
+				size -= diff;
+				o.setSize(o.getSize() - diff);
+			}
+			if (size == 0)
+				break;
+		}
 	}
 
 	public Order findBest(char type) {
