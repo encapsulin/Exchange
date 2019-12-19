@@ -19,6 +19,10 @@ public class OrderBook {
 	String file_in = "";
 	String file_out = "";
 
+	public OrderBook() {
+
+	}
+
 	public OrderBook(String file_in, String file_out) {
 		this.file_in = file_in;
 		this.file_out = file_out;
@@ -84,17 +88,19 @@ public class OrderBook {
 		Order orderMatch = null;
 		boolean foundBestMatchingOrder = false;
 		do {
+			foundBestMatchingOrder = false;
 			if (order.getType() == 'a')
 				orderMatch = findBest('b');
 			if (order.getType() == 'b')
 				orderMatch = findBest('a');
 //			if (orderMatch != null && orderMatch.getPrice() == order.getPrice()) {
-			if (orderMatch != null && orderMatch.getPrice() == order.getPrice()) {
+			if (orderMatch != null && orderMatch.getPrice() == order.getPrice() && orderMatch.getSize() > 0
+					&& order.getSize() > 0) {
 				foundBestMatchingOrder = true;
-				System.out.println(order);
-				int diff = Math.abs(order.getSize() - orderMatch.getSize());
-				order.setSize(order.getSize() - diff);
-				orderMatch.setSize(orderMatch.getSize() - diff);
+				System.out.println(orderMatch);
+				int min = Math.min(order.getSize(), orderMatch.getSize());
+				order.setSize(order.getSize() - min);
+				orderMatch.setSize(orderMatch.getSize() - min);
 			} else
 				foundBestMatchingOrder = false;
 
@@ -105,7 +111,8 @@ public class OrderBook {
 	}
 
 	void fileOutput(String s) {
-
+		if (file_out.equals(""))
+			return;
 		try {
 			FileWriter fw = new FileWriter(file_out, true);
 			BufferedWriter bw = new BufferedWriter(fw);

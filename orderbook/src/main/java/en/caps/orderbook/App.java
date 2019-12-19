@@ -16,7 +16,6 @@ public class App
         if(args.length > 1)
         	file_out = args[1];        
         
-        
         OrderBook ob = new OrderBook(file_in,file_out);
         try {
 			ob.processFile();
