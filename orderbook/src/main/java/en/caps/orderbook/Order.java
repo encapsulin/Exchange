@@ -36,7 +36,20 @@ public class Order {
 	public void setType(char type) {
 		this.type = type;
 	}
-	
-	
+
+	public static char parseType(String s) {
+		char type = 's';
+		if (s.matches(".*(bid|buy).*"))
+			type = 'b';
+		if (s.matches(".*(ask|sell).*"))
+			type = 'a';
+		return type;
+	}
+
+	@Override
+	public String toString() {
+		return "Order [price=" + price + ", size=" + size + ", type=" + type + "]";
+	}
+
 
 }
